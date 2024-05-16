@@ -2,11 +2,12 @@ import logging
 import os
 import psutil
 import telegram
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove
 from telegram.constants import ParseMode
-from telegram.ext import Updater, CommandHandler, MessageHandler, filters, ConversationHandler, CallbackContext, CallbackQueryHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, ConversationHandler, CallbackQueryHandler, Filters, CallbackContext
+
 from pymongo import MongoClient
-from config import BOT_TOKEN, MONGODB_URI, API_ID, API_HASH
+from config import BOT_TOKEN, MONGODB_URI
 
 # Initialize logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -128,22 +129,6 @@ def end_settings(update: Update, context: CallbackContext):
     query.message.reply_text("Change your settings as your wish.", reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
 
-def main():
-    updater = Updater(token=BOT_TOKEN, use_context=True)
-    dispatcher = updater.dispatcher
-
-    # Define conversation handler for settings
-    settings_conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('settings', start_settings)],
-        states={
-            CHOOSING: [CallbackQueryHandler(select_option)],
-        },
-        fallbacks=[],
-    )
-
-    dispatcher.add_handler(settings_conv_handler)
-
-
 def how_to_use(update: Update, context: CallbackContext):
     update.message.reply_text(
         "⚠️ Before Forwarding:\n"
@@ -213,108 +198,39 @@ def dummy_bot(update: Update, context: CallbackContext):
 def user_bot(update: Update, context: CallbackContext):
     # Handle adding a userbot
     pass
-    
-def channels(update: Update, context: CallbackContext):
-    # Handle channel management (add, remove, etc.)
-    pass
-    
-def add_chat(update: Update, context: CallbackContext):
-    # Handle adding a chat to the configuration
-    pass
-    
-def about(update: Update, context: CallbackContext):
-    about_message = (
-        "╔════❰ ғᴏʀᴡᴀʀᴅ ʙᴏᴛ ❱═❍⊱❁۪۪\n"
-        "║╭━━━━━━━━━━━━━━━➣\n"
-        "║┣⪼📃ʙᴏᴛ : ғᴏʀᴡᴀʀᴅ ʙᴏᴛ\n"
-        "║┣⪼👦ᴄʀᴇᴀᴛᴏʀ : ᴍadhu\n"
-        "║┣⪼📡ʜᴏsᴛᴇᴅ ᴏɴ : Render\n"
-        "║┣⪼🗣️ʟᴀɴɢᴜᴀɢᴇ : ᴘʏᴛʜᴏɴ3\n"
-        "║┣⪼📚ʟɪʙʀᴀʀʏ : ᴘʏʀᴏɢʀᴀᴍ ᴀsʏɴᴄɪᴏ 2.0.0\n"
-        "║┣⪼🗒️ᴠᴇʀsɪᴏɴ : 1.0.0\n"
-        "║╰━━━━━━━━━━━━━━━➣\n"
-        "╚══════════════════❍⊱❁۪۪"
-    )
-    update.message.reply_text(about_message, parse_mode=ParseMode.MARKDOWN)
-    
-def caption(update: Update, context: CallbackContext):
-    # Handle custom caption settings
-    pass
-    
-def database(update: Update, context: CallbackContext):
-    # Handle database settings (e.g., adding MongoDB)
-    pass
-    
-def filters(update: Update, context: CallbackContext):
-    # Handle message filtering settings
-    pass
-    
-def button(update: Update, context: CallbackContext):
-    # Handle custom button settings
-    pass
-    
-def add_caption(update: Update, context: CallbackContext):
-    # Handle adding a custom caption to messages
-    pass
-    
-def add_mongodb_database(update: Update, context: CallbackContext):
-    # Handle adding MongoDB database information
-    pass
-    
-def add_database(update: Update, context: CallbackContext):
-    # Handle adding a database information
-    pass
 
-def filters(update: Update, context: CallbackContext):
-    # Handle message filtering settings
-    pass
+# Create the handlers
+start_handler = CommandHandler('start', start)
+donate_handler = CommandHandler('donate', donate)
+help_handler = CommandHandler('help', help_command)
+private_forward_handler = CommandHandler('private_forward', private_forward)
+forward_message_handler = CommandHandler('forward', forward_message)
+how_to_use_handler = CommandHandler('how_to_use', how_to_use)
+status_handler = CommandHandler('status', status)
+server_status_handler = CommandHandler('server_status', server_status)
+bots_handler = CommandHandler('bots', bots)
+dummy_bot_handler = CommandHandler('dummy_bot', dummy_bot)
+user_bot_handler = CommandHandler('user_bot', user_bot)
 
-def next(update: Update, context: CallbackContext):
-    # Handle the "Next" button to continue filter settings
-    pass
-
-def add_button(update: Update, context: CallbackContext):
-    # Handle adding a custom button
-    pass
-
-# Add command handlers
-dispatcher.add_handler(CommandHandler('add_database', add_database))
-dispatcher.add_handler(filter_settings_conversation)  # Add conversation handler for filters
-
-
-# Add other handlers and conversation handlers as needed
+# Add the handlers to the dispatcher
+dispatcher.add_handler(start_handler)
+dispatcher.add_handler(donate_handler)
+dispatcher.add_handler(help_handler)
+dispatcher.add_handler(private_forward_handler)
+dispatcher.add_handler(forward_message_handler)
+dispatcher.add_handler(how_to_use_handler)
+dispatcher.add_handler(status_handler)
+dispatcher.add_handler(server_status_handler)
+dispatcher.add_handler(bots_handler)
+dispatcher.add_handler(dummy_bot_handler)
+dispatcher.add_handler(user_bot_handler)
 
 # Initialize the Updater and dispatcher
 updater = Updater(token=BOT_TOKEN, use_context=True)
 dispatcher = updater.dispatcher
 
-# Register command handlers
-dispatcher.add_handler(CommandHandler('start', start))
-dispatcher.add_handler(CommandHandler('help', help_command))
-dispatcher.add_handler(CommandHandler('private_forward', private_forward))
-dispatcher.add_handler(CommandHandler('server_status', server_status))
-dispatcher.add_handler(CommandHandler('bots', bots))
-dispatcher.add_handler(CommandHandler('dummy_bot', dummy_bot))
-dispatcher.add_handler(CommandHandler('user_bot', user_bot))
-dispatcher.add_handler(CommandHandler('channels', channels))
-dispatcher.add_handler(CommandHandler('add_chat', add_chat))
-dispatcher.add_handler(CommandHandler('about', about))
-dispatcher.add_handler(CommandHandler('caption', caption))
-dispatcher.add_handler(CommandHandler('database', database))
-dispatcher.add_handler(CommandHandler('filters', filters))
-dispatcher.add_handler(CommandHandler('button', button))
-dispatcher.add_handler(CommandHandler('add_caption', add_caption))
-dispatcher.add_handler(CommandHandler('add_mongodb_database', add_mongodb_database))
-dispatcher.add_handler(CommandHandler('status', status))
-dispatcher.add_handler(CommandHandler('donate', donate))
-dispatcher.add_handler(CommandHandler('how_to_use', how_to_use))
-dispatcher.add_handler(CommandHandler('forward', forward_message))
-dispatcher.add_handler(CommandHandler('settings', settings))
-
-
-# Start the bot
+# Start the Bot
 updater.start_polling()
 updater.idle()
 
-if __name__ == '__main__':
-    main()
+
