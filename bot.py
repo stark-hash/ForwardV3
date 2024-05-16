@@ -199,6 +199,11 @@ def user_bot(update: Update, context: CallbackContext):
     # Handle adding a userbot
     pass
 
+def main():
+    # Initialize the Updater and dispatcher
+    updater = Updater(token=BOT_TOKEN, use_context=True)
+    dispatcher = updater.dispatcher
+
 # Create the handlers
 start_handler = CommandHandler('start', start)
 donate_handler = CommandHandler('donate', donate)
