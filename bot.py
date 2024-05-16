@@ -17,7 +17,7 @@ bot = telegram.Bot(token=BOT_TOKEN)
 
 # Create a MongoDB client
 mongo_client = MongoClient(MONGODB_URI)
-db = mongo_client['your_database_name']  # Replace with your actual database name
+db = mongo_client['Cluster0']  # Replace with your actual database name
 user_settings_collection = db['user_settings']
 forwarded_messages_collection = db['forwarded_messages']
 
@@ -276,16 +276,6 @@ def next(update: Update, context: CallbackContext):
 def add_button(update: Update, context: CallbackContext):
     # Handle adding a custom button
     pass
-
-# Conversation handler for filter settings
-filter_settings_conversation = ConversationHandler(
-    entry_points=[CommandHandler('filters', filters)],
-    states={
-        STATE_ONE: [MessageHandler(Filters.text & ~Filters.command, next)],
-        STATE_TWO: [MessageHandler(Filters.text & ~Filters.command, add_button)],
-    },
-    fallbacks=[],
-)
 
 # Add command handlers
 dispatcher.add_handler(CommandHandler('add_database', add_database))
