@@ -39,7 +39,7 @@ def start(update: Update, context: CallbackContext):
 def donate(update: Update, context: CallbackContext):
     donate_message = (
         "If you liked me ❤️, consider making a donation to support my developer 👦\n"
-        "UPI ID - `krishna527062@oksbi`"
+        "UPI ID - `fdep@axl`"
     )
     update.message.reply_text(donate_message, parse_mode=ParseMode.MARKDOWN)
 
@@ -86,7 +86,7 @@ def start_settings(update: Update, context: CallbackContext):
     reply_keyboard = [
         [InlineKeyboardButton("Bots", callback_data="bots"), InlineKeyboardButton("Channels", callback_data="channels")],
         [InlineKeyboardButton("Caption", callback_data="caption")],
-        [InlineKeyboardButton("Database", callback_data="database"), InlineKeyboardButton("Filters", callback_data="filters")],
+        [InlineKeyboardButton("Database", callback_data="database"), InlineKeyboardButton("filters", callback_data="filters")],
         [InlineKeyboardButton("Button", callback_data="button")],
         [InlineKeyboardButton("Back", callback_data="back")]
     ]
@@ -113,7 +113,7 @@ def select_option(update: Update, context: CallbackContext):
     elif option == 'database':
         query.message.reply_text("🗃️ Database\n\nA database is necessary to store your duplicate messages and for the de-duplication process.")
     elif option == 'filters':
-        query.message.reply_text("🌟 Custom Filters\n\nConfigure the type of messages which you want to forward.")
+        query.message.reply_text("🌟 Custom filters\n\nConfigure the type of messages which you want to forward.")
     elif option == 'button':
         query.message.reply_text("🔘 Custom Button\n\nYou can add inline buttons to messages with the following format:\n\nSingle Button in a row:\n\n[forward bot][buttonurl:https://t.me/mdforwardbot]\n\nMore than one button in the same row:\n\n[forward bot][buttonurl:https://t.me/mdforwardbot]\n[forward bot][buttonurl:https://t.me/mdforwardbot(:same)]")
     elif option == 'back':
@@ -281,8 +281,8 @@ def add_button(update: Update, context: CallbackContext):
 filter_settings_conversation = ConversationHandler(
     entry_points=[CommandHandler('filters', filters)],
     states={
-        STATE_ONE: [MessageHandler(Filters.text & ~Filters.command, next)],
-        STATE_TWO: [MessageHandler(Filters.text & ~Filters.command, add_button)],
+        STATE_ONE: [MessageHandler(filters.text & ~filters.command, next)],
+        STATE_TWO: [MessageHandler(filters.text & ~filters.command, add_button)],
     },
     fallbacks=[],
 )
