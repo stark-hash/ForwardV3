@@ -7,7 +7,6 @@ from telegram.constants import ParseMode
 from telegram.ext import Updater, CommandHandler, MessageHandler, filters, ConversationHandler, CallbackContext, CallbackQueryHandler
 from pymongo import MongoClient
 from config import BOT_TOKEN, MONGODB_URI, API_ID, API_HASH
-from pyrogram import Client
 
 # Initialize logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -16,9 +15,9 @@ logger = logging.getLogger(__name__)
 # Initialize Telegram bot
 bot = telegram.Bot(token=BOT_TOKEN)
 
-# Create a MongoDB Client
-mongo_Client = MongoClient(MONGODB_URI)
-db = mongo_Client['your_database_name']  # Replace with your actual database name
+# Create a MongoDB client
+mongo_client = MongoClient(MONGODB_URI)
+db = mongo_client['your_database_name']  # Replace with your actual database name
 user_settings_collection = db['user_settings']
 forwarded_messages_collection = db['forwarded_messages']
 
@@ -40,7 +39,7 @@ def start(update: Update, context: CallbackContext):
 def donate(update: Update, context: CallbackContext):
     donate_message = (
         "If you liked me ❤️, consider making a donation to support my developer 👦\n"
-        "UPI ID - `fdep@axl`"
+        "UPI ID - `krishna527062@oksbi`"
     )
     update.message.reply_text(donate_message, parse_mode=ParseMode.MARKDOWN)
 
@@ -87,7 +86,7 @@ def start_settings(update: Update, context: CallbackContext):
     reply_keyboard = [
         [InlineKeyboardButton("Bots", callback_data="bots"), InlineKeyboardButton("Channels", callback_data="channels")],
         [InlineKeyboardButton("Caption", callback_data="caption")],
-        [InlineKeyboardButton("Database", callback_data="database"), InlineKeyboardButton("filters", callback_data="filters")],
+        [InlineKeyboardButton("Database", callback_data="database"), InlineKeyboardButton("Filters", callback_data="filters")],
         [InlineKeyboardButton("Button", callback_data="button")],
         [InlineKeyboardButton("Back", callback_data="back")]
     ]
@@ -114,7 +113,7 @@ def select_option(update: Update, context: CallbackContext):
     elif option == 'database':
         query.message.reply_text("🗃️ Database\n\nA database is necessary to store your duplicate messages and for the de-duplication process.")
     elif option == 'filters':
-        query.message.reply_text("🌟 Custom filters\n\nConfigure the type of messages which you want to forward.")
+        query.message.reply_text("🌟 Custom Filters\n\nConfigure the type of messages which you want to forward.")
     elif option == 'button':
         query.message.reply_text("🔘 Custom Button\n\nYou can add inline buttons to messages with the following format:\n\nSingle Button in a row:\n\n[forward bot][buttonurl:https://t.me/mdforwardbot]\n\nMore than one button in the same row:\n\n[forward bot][buttonurl:https://t.me/mdforwardbot]\n[forward bot][buttonurl:https://t.me/mdforwardbot(:same)]")
     elif option == 'back':
@@ -130,8 +129,8 @@ def end_settings(update: Update, context: CallbackContext):
     return ConversationHandler.END
 
 def main():
-    updater = Updater(token=TELEGRAM_BOT_TOKEN, use_context=True)
-    Client = updater.Client
+    updater = Updater(token=BOT_TOKEN, use_context=True)
+    dispatcher = updater.dispatcher
 
     # Define conversation handler for settings
     settings_conv_handler = ConversationHandler(
@@ -142,7 +141,7 @@ def main():
         fallbacks=[],
     )
 
-    Client.add_handler(settings_conv_handler)
+    dispatcher.add_handler(settings_conv_handler)
 
 
 def how_to_use(update: Update, context: CallbackContext):
@@ -228,7 +227,7 @@ def about(update: Update, context: CallbackContext):
         "╔════❰ ғᴏʀᴡᴀʀᴅ ʙᴏᴛ ❱═❍⊱❁۪۪\n"
         "║╭━━━━━━━━━━━━━━━➣\n"
         "║┣⪼📃ʙᴏᴛ : ғᴏʀᴡᴀʀᴅ ʙᴏᴛ\n"
-        "║┣⪼👦ᴄʀᴇᴀᴛᴏʀ : TESLA\n"
+        "║┣⪼👦ᴄʀᴇᴀᴛᴏʀ : ᴍadhu\n"
         "║┣⪼📡ʜᴏsᴛᴇᴅ ᴏɴ : Render\n"
         "║┣⪼🗣️ʟᴀɴɢᴜᴀɢᴇ : ᴘʏᴛʜᴏɴ3\n"
         "║┣⪼📚ʟɪʙʀᴀʀʏ : ᴘʏʀᴏɢʀᴀᴍ ᴀsʏɴᴄɪᴏ 2.0.0\n"
@@ -278,39 +277,49 @@ def add_button(update: Update, context: CallbackContext):
     # Handle adding a custom button
     pass
 
+# Conversation handler for filter settings
+filter_settings_conversation = ConversationHandler(
+    entry_points=[CommandHandler('filters', filters)],
+    states={
+        STATE_ONE: [MessageHandler(Filters.text & ~Filters.command, next)],
+        STATE_TWO: [MessageHandler(Filters.text & ~Filters.command, add_button)],
+    },
+    fallbacks=[],
+)
+
 # Add command handlers
-Client.add_handler(CommandHandler('add_database', add_database))
-Client.add_handler(filter_settings_conversation)  # Add conversation handler for filters
+dispatcher.add_handler(CommandHandler('add_database', add_database))
+dispatcher.add_handler(filter_settings_conversation)  # Add conversation handler for filters
 
 
 # Add other handlers and conversation handlers as needed
 
-# Initialize the Updater and Client
-updater = Updater(token=TELEGRAM_BOT_TOKEN, use_context=True)
-Client = updater.Client
+# Initialize the Updater and dispatcher
+updater = Updater(token=BOT_TOKEN, use_context=True)
+dispatcher = updater.dispatcher
 
 # Register command handlers
-Client.add_handler(CommandHandler('start', start))
-Client.add_handler(CommandHandler('help', help_command))
-Client.add_handler(CommandHandler('private_forward', private_forward))
-Client.add_handler(CommandHandler('server_status', server_status))
-Client.add_handler(CommandHandler('bots', bots))
-Client.add_handler(CommandHandler('dummy_bot', dummy_bot))
-Client.add_handler(CommandHandler('user_bot', user_bot))
-Client.add_handler(CommandHandler('channels', channels))
-Client.add_handler(CommandHandler('add_chat', add_chat))
-Client.add_handler(CommandHandler('about', about))
-Client.add_handler(CommandHandler('caption', caption))
-Client.add_handler(CommandHandler('database', database))
-Client.add_handler(CommandHandler('filters', filters))
-Client.add_handler(CommandHandler('button', button))
-Client.add_handler(CommandHandler('add_caption', add_caption))
-Client.add_handler(CommandHandler('add_mongodb_database', add_mongodb_database))
-Client.add_handler(CommandHandler('status', status))
-Client.add_handler(CommandHandler('donate', donate))
-Client.add_handler(CommandHandler('how_to_use', how_to_use))
-Client.add_handler(CommandHandler('forward', forward_message))
-Client.add_handler(CommandHandler('settings', settings))
+dispatcher.add_handler(CommandHandler('start', start))
+dispatcher.add_handler(CommandHandler('help', help_command))
+dispatcher.add_handler(CommandHandler('private_forward', private_forward))
+dispatcher.add_handler(CommandHandler('server_status', server_status))
+dispatcher.add_handler(CommandHandler('bots', bots))
+dispatcher.add_handler(CommandHandler('dummy_bot', dummy_bot))
+dispatcher.add_handler(CommandHandler('user_bot', user_bot))
+dispatcher.add_handler(CommandHandler('channels', channels))
+dispatcher.add_handler(CommandHandler('add_chat', add_chat))
+dispatcher.add_handler(CommandHandler('about', about))
+dispatcher.add_handler(CommandHandler('caption', caption))
+dispatcher.add_handler(CommandHandler('database', database))
+dispatcher.add_handler(CommandHandler('filters', filters))
+dispatcher.add_handler(CommandHandler('button', button))
+dispatcher.add_handler(CommandHandler('add_caption', add_caption))
+dispatcher.add_handler(CommandHandler('add_mongodb_database', add_mongodb_database))
+dispatcher.add_handler(CommandHandler('status', status))
+dispatcher.add_handler(CommandHandler('donate', donate))
+dispatcher.add_handler(CommandHandler('how_to_use', how_to_use))
+dispatcher.add_handler(CommandHandler('forward', forward_message))
+dispatcher.add_handler(CommandHandler('settings', settings))
 
 
 # Start the bot
